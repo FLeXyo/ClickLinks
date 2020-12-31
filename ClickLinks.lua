@@ -5,7 +5,7 @@
 -- Version: 1.0.8
 
 -- regex is like titanforging
-URL_PATTERNS = {
+local URL_PATTERNS = {
     -- X://Y most urls
     "^(%a[%w+.-]+://%S+)",
     "%f[%S](%a[%w+.-]+://%S+)",
@@ -38,13 +38,12 @@ URL_PATTERNS = {
 }
 -- i fucking hate it
 
-function formatURL(url)
-    url = "|cff".."149bfd".."|Hurl:"..url.."|h["..url.."]|h|r ";
-    return url;
+local function formatURL(url)
+    return "|cff".."149bfd".."|Hurl:"..url.."|h["..url.."]|h|r ";
 end
 
 
-function makeClickable(self, event, msg, ...)
+local function makeClickable(self, event, msg, ...)
     --print(msg:gsub("|", "TEST"));
     -- |cffffff00|Hworldmap:1670:5279:8880|h[|A:Waypoint-MapPin-ChatIcon:13:13:0:0|a Map Pin Location]|h|r
     -- \124cffffff00\124Hworldmap:mapid:xxxx:yyyy\124h[\124A:Waypoint-MapPin-ChatIcon:13:13:0:0\124a Map Pin Location]\124h\124r
@@ -75,18 +74,18 @@ StaticPopupDialogs["CLICK_LINK_CLICKURL"] = {
     hasEditBox = true
 }
 
-local SetItemRef_orig = SetItemRef;
-function ClickURL_SetItemRef(link, text, button)
+local ChatFrame_OnHyperlinkShow_orig = ChatFrame_OnHyperlinkShow;
+local function ClickURL_ChatFrame_OnHyperlinkShow(frame, link, text, button)
     if (string.sub(link, 1, 3) == "url") then
         local url = string.sub(link, 5);
         local d = {}
         d.url = url
         StaticPopup_Show("CLICK_LINK_CLICKURL", "", "", d)
     else
-        SetItemRef_orig(link, text, button);
+        ChatFrame_OnHyperlinkShow_orig(frame, link, text, button);
     end
 end
-SetItemRef = ClickURL_SetItemRef;
+ChatFrame_OnHyperlinkShow = ClickURL_ChatFrame_OnHyperlinkShow;
 
 
 local CHAT_TYPES = {
@@ -113,6 +112,6 @@ local CHAT_TYPES = {
     "SYSTEM"
 }
 
-for _, type in pairs(CHAT_TYPES) do
-    ChatFrame_AddMessageEventFilter("CHAT_MSG_" .. type, makeClickable)
+for _, chatType in pairs(CHAT_TYPES) do
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_" .. chatType, makeClickable)
 end
